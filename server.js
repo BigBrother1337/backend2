@@ -5,7 +5,7 @@ app.use(cors());
 app.use(express.json());
 const mongoose = require('mongoose');
 
-const url = `mongodb+srv://aleksandrs:BdUH2gb83EfEeBx@cluster0.q8nte.mongodb.net/tests?retryWrites=true&w=majority`;
+const url = `mongodb+srv://aleksandrs:BdUH2gb83EfEeBx@cluster0.q8nte.mongodb.net/ManaDB?retryWrites=true&w=majority`;
 
 mongoose
   .connect(url)
@@ -21,10 +21,12 @@ const testSchema = new mongoose.Schema({
   },
   Dzeriens: {
     type: String,
+    unique: true,
     required: "Dzērienam jābūt ievadītam"
   },
   Saldais: {
     type: String,
+    unique: true,
     required: "Saldajam jābūt ievadītam"
   },
 });
@@ -49,12 +51,26 @@ app.post(`/`, function(req,res){
         status: "failed",
         error: "Ēdiens jau pastāv!"
       });
-    } else {
+    } 
+    else if (err.keyValue.Saldais) {
+      res.status(500).json({
+        status: "failed",
+        error: "Saldais jau pastāv!"
+      });
+    }
+    else if (err.keyValue.Dzeriens) {
+      res.status(500).json({
+        status: "failed",
+        error: "Dzēriens jau pastāv!"
+      });
+    }
+    else {
       res.status(500).json({
         status: "failed",
         error: err
       });
     }
+    
 });
 });
 app.listen(port, () => {
